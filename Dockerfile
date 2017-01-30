@@ -151,6 +151,7 @@ WORKDIR /var/www/html
 #ADD /docker/php/composer-cache.tar.gz /var/www/
 RUN set -ex \
   && composer install \
+  && touch database/database.sqlite \
   && php artisan migrate
 #  && rm -rf .composer
 ADD supervisor.conf /etc/supervisor.conf
