@@ -1,7 +1,9 @@
 FROM php:7.1-fpm-alpine
 
-ENV TZ JST-9
-ENV NGINX_VERSION 1.11.8
+# nginx
+MAINTAINER NGINX Docker Maintainers "docker-maint@nginx.com"
+
+ENV NGINX_VERSION 1.11.9
 
 RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
   && CONFIG="\
@@ -117,6 +119,9 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
       | xargs -r apk info --installed \
       | sort -u \
   )" \
+  && apk add --no-cache --virtual .nginx-rundeps $runDeps \
+  && apk del .build-deps \
+  && apk del .gettext \
   && mv /tmp/envsubst /usr/local/bin/ \
   \
   # forward request and error logs to docker log collector
@@ -125,25 +130,28 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx.vh.default.conf /etc/nginx/conf.d/default.conf
-COPY nginx.app.conf /etc/nginx/conf.d/app.conf
 
 EXPOSE 80 443
 
-# PHP Supervisor
+# supervisor
+RUN apk add --no-cache supervisor sqlite
+
+# PHP extensions
 RUN set -ex \
   && apk add --no-cache --virtual .php-builddeps \
-    zlib-dev supervisor sqlite sqlite-dev $runDeps \
+    zlib-dev sqlite-dev \
   && docker-php-ext-install opcache zip pdo_sqlite \
   && curl -sS https://getcomposer.org/installer \
     | php -- --install-dir=/usr/local/bin --filename=composer --version=1.2.0 \
-  && apk del --purge .php-builddeps .build-deps .gettext
+  && apk del --purge .php-builddeps
 
 COPY ./src /var/www/html
 WORKDIR /var/www/html
 
 #ADD /docker/php/composer-cache.tar.gz /var/www/
 RUN set -ex \
-  && composer install
+  && composer install \
+  && php artisan migrate
 #  && rm -rf .composer
 ADD supervisor.conf /etc/supervisor.conf
 

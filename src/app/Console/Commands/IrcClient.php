@@ -28,11 +28,11 @@ class IrcClient extends Command
      */
     public function handle()
     {
-        $uri    = 'irc://irc.ircnet.ne.jp:6661';
+        $uri    = 'irc://irc.ircnet.ne.jp:6662';
         $client = new Hoa\Irc\Client(new Hoa\Socket\Client($uri));
 
         $client->on('open', function (Hoa\Event\Bucket $bucket) {
-            $bucket->getSource()->join('edabot', '#brahmer');
+            $bucket->getSource()->join('g_bot', '#open-golgo');
             return;
         });
         $client->on('mention', function (Hoa\Event\Bucket $bucket) {
