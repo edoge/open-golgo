@@ -42,7 +42,7 @@ class IrcClient extends Command
             $words = explode(' ', $message);
             switch(trim(head($words))) {
                 case "tg":
-                    $bucket->getSource()->say("not implemented.");
+                    $bucket->getSource()->say(TeamGenerator::make(array_shift($words)));
                     break;
                 case "rank":
                     if (count($words) !== 2){
@@ -59,7 +59,6 @@ class IrcClient extends Command
                 default:
                     return;
             }
-            return;
         });
         $client->on('mention', function(Hoa\Event\Bucket $bucket) {
             $data    = $bucket->getData();

@@ -40,7 +40,7 @@ $ docker stop <container id>
 
 requirements
 
-* php 7.0
+* php 7.0 over
 * composer
 
 ### setup
@@ -53,7 +53,7 @@ $ composer install
 ### boot crawler
 
 ```
-$ php artinsan boot:crawl
+$ php artisan boot:crawl
 ```
 
 ### boot irc bot
