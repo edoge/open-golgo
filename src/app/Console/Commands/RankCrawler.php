@@ -37,12 +37,16 @@ class RankCrawler extends Command
             if(count($element->filter('td'))){
                 $rank = $element->filter('td')->eq(1)->text();
                 $name = $element->filter('td')->eq(3)->text();
+                $win  = $element->filter('td')->eq(4)->text();
+                $lose = $element->filter('td')->eq(5)->text();
                 $player = Players::where('name', $name)->first();
                 if (is_null($player)) {
                     $player = new Players();
                     $player->name = $name;
                 }
                 $player->rank = $rank;
+                $player->win  = $win;
+                $player->lose = $lose;
                 $player->save();
             }
         });

@@ -1,19 +1,23 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\BotCommands;
 
 use App\Models\Players;
 
-class TeamGenerator
+class MessageTg
 {
-    public static function make($names)
+    public function handle($words)
     {
-        if (count($names) !== 8) {
+        if (count($names) !== 9) {
             return 'players are short.';
         }
+        $names = array_map($words, function($elem){
+            return strtolower(trim($elem));
+        });
+        array_shift($names);
         $notfound = [];
-        foreach($names as $name) {
-            $player = Players::where('name', strtolower(trim($name)))->first();
+        foreach($names as $index => $name) {
+            $player = Players::where('name', $name)->first();
             if (is_null($player)) {
                 $notfound[] = $name;
             }

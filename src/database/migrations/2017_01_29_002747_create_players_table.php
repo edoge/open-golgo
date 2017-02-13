@@ -17,6 +17,8 @@ class CreatePlayersTable extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->decimal('rank',5,2);
+            $table->integer('win');
+            $table->integer('lose');
             $table->timestamps();
         });
     }
