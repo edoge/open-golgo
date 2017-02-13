@@ -51,10 +51,8 @@ class IrcClient extends Command
             $data    = $bucket->getData();
             $message = $data['message'];
             $words = explode(' ', $message);
-            if (count($words) > 0) {
-                array_shift($words);
-            }
-            $class_name = 'App\BotCommands\Mention' . ucfirst(camel_case(trim($message)));
+            if (count($words) < 2) return;
+            $class_name = 'App\BotCommands\Mention' . ucfirst(camel_case(trim($words[1])));
             if (class_exists($class_name)) {
                 $executor = new $class_name();
                 $bucket->getSource()->say($executor->handle());

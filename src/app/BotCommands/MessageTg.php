@@ -8,15 +8,15 @@ class MessageTg
 {
     public function handle($words)
     {
-        if (count($names) !== 9) {
+        if (count($words) !== 9) {
             return 'players are short.';
         }
-        $names = array_map($words, function($elem){
+        $names = array_map(function($elem){
             return strtolower(trim($elem));
-        });
+        }, $words);
         array_shift($names);
         $notfound = [];
-        foreach($names as $index => $name) {
+        foreach($names as $name) {
             $player = Players::where('name', $name)->first();
             if (is_null($player)) {
                 $notfound[] = $name;
@@ -48,7 +48,6 @@ class MessageTg
             }
             return $carry;
         }, ['team1_member'=>'', 'team1_total'=>0, 'team2_member'=>'', 'team2_total'=>0]);
-        return $result['team1_member'] . ' VS ' . $result['team2_member'] . '__' .
-               $result['team1_total']  . ' VS ' . $result['team2_total'];
+        return $result['team1_member'] . '(' . $result['team1_total'] . ') VS (' . $result['team2_total'] . ')' . $result['team2_member'];
     }
 }
