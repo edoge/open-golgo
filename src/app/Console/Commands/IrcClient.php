@@ -28,11 +28,11 @@ class IrcClient extends Command
      */
     public function handle()
     {
-        $uri    = 'irc://irc.livedoor.ne.jp:6662';
+        $uri    = env('IRC_SERVER', 'irc://irc.livedoor.ne.jp:6662');
         $client = new Hoa\Irc\Client(new Hoa\Socket\Client($uri));
 
         $client->on('open', function (Hoa\Event\Bucket $bucket) {
-            $bucket->getSource()->join('open_g2', '#open-golgo2');
+            $bucket->getSource()->join(env('BOT_NAME', 'open_g'), env('BOT_CHANNEL', '#open-golgo'));
             return;
         });
         $client->on('message', function (Hoa\Event\Bucket $bucket) {

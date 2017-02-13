@@ -22,6 +22,11 @@
             "App\\": "app/"
         }
     },
+    "scripts": {
+        "post-install-cmd": [
+            "php -r \"copy('.env.example', '.env');\""
+        ]
+    },
     "autoload-dev": {
         "classmap": [
             "tests/",
