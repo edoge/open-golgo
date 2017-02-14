@@ -38,13 +38,26 @@ class IrcClient extends Command
         $client->on('message', function (Hoa\Event\Bucket $bucket) {
             $data    = $bucket->getData();
             $message = $data['message'];
-            $words = explode(' ', $message);
-
-            $key = trim(head($words));
-            $class_name = 'App\BotCommands\Message' . ucfirst(camel_case($key));
-            if (class_exists($class_name)) {
-                $executor = new $class_name();
-                $bucket->getSource()->say($executor->handle($words));
+            if (strPos($message, ' ') !== false) {
+                $words = explode(' ', $message);
+                $key = trim(head($words));
+                $class_name = 'App\BotCommands\Message' . ucfirst($key);
+                if (class_exists($class_name)) {
+                    $executor = new $class_name();
+                    $bucket->getSource()->say($executor->handle($words));
+                }
+            } else {
+                $mapping = config('app.mapping');
+                $converted = mb_convert_encoding(trim($message), mb_internal_encoding(), config('app.irc_encoding'));
+                if (array_key_exists($converted, $mapping)) {
+                    if (is_callable($mapping[$converted])) {
+                        $bucket->getSource()->say(mb_convert_encoding($mapping[$converted](), config('app.irc_encoding')));
+                    } else {
+                        $class_name = 'App\BotCommands\Message' . $mapping[$converted];
+                        $executor = new $class_name();
+                        $bucket->getSource()->say($executor->handle());
+                    }
+                }
             }
         });
         $client->on('mention', function(Hoa\Event\Bucket $bucket) {
