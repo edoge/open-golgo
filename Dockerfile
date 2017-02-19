@@ -148,12 +148,14 @@ RUN set -ex \
 COPY ./src /var/www/html
 WORKDIR /var/www/html
 
-#ADD /docker/php/composer-cache.tar.gz /var/www/
 RUN set -ex \
   && composer install \
   && touch database/database.sqlite \
   && php artisan migrate
-#  && rm -rf .composer
-ADD supervisor.conf /etc/supervisor.conf
 
-CMD ["supervisord", "-c", "/etc/supervisor.conf"]
+ADD supervisor.conf /etc/supervisor.conf
+ADD backup_database.sh /etc/periodic/hourly/
+ADD entrypoint.sh /root/
+RUN rm /etc/periodic/monthly/geoip
+
+CMD ["/root/entrypoint.sh"]
