@@ -16,29 +16,25 @@ class MessageTg
         }, $words);
         array_shift($names);
         $notfound = [];
+        $players = [];
+        $ranks = [];
         foreach($names as $name) {
             $player = Players::where('name', $name)->first();
             if (is_null($player)) {
                 $notfound[] = $name;
+            } else {
+                $players[] = $player;
+                $ranks[] = $player->rank;
             }
         }
         if (count($notfound) > 0) {
             return implode(',', $notfound) . ' not found.';
         }
-        $players = Players::whereIn('name', $names)->orderBy('rank', 'desc')->get();
-        $team1 = $team2 = $team1_cnt = $team2_cnt = 0;
-        foreach($players as $player) {
-            if ($team1 > $team2) {
-                $team2 += $player->rank;
-                $player->team = 2;
-                $team2_cnt++;
-            } else {
-                $team1 += $player->rank;
-                $player->team = 1;
-                $team1_cnt++;
-            }
+        $team = $this->getTeam($ranks);
+        foreach($players as $index => $player) {
+            $player->team = $team[$index];
         }
-        $result = array_reduce($players->all(), function($carry, $player) {
+        $result = array_reduce($players, function($carry, $player) {
             if ($player->team === 1) {
                 $carry['team1_member'] .= $player->name . $player->rank;
                 $carry['team1_total'] += $player->rank;
@@ -49,5 +45,55 @@ class MessageTg
             return $carry;
         }, ['team1_member'=>'', 'team1_total'=>0, 'team2_member'=>'', 'team2_total'=>0]);
         return $result['team1_member'] . '(' . $result['team1_total'] . ') VS (' . $result['team2_total'] . ')' . $result['team2_member'];
+    }
+
+    private function getTeam($ranks)
+    {
+        $patterns = [
+            [1,1,1,1,2,2,2,2],
+            [1,1,1,2,1,2,2,2],
+            [1,1,1,2,2,1,2,2],
+            [1,1,1,2,2,2,1,2],
+            [1,1,1,2,2,2,2,1],
+            [1,1,2,1,1,2,2,2],
+            [1,1,2,1,2,1,2,2],
+            [1,1,2,1,2,2,1,2],
+            [1,1,2,1,2,2,2,1],
+            [1,1,2,2,1,1,2,2],
+            [1,1,2,2,2,1,1,2],
+            [1,1,2,2,2,2,1,1],
+            [1,2,1,1,1,2,2,2],
+            [1,2,1,1,2,1,2,2],
+            [1,2,1,1,2,2,1,2],
+            [1,2,1,1,2,2,2,1],
+            [1,2,1,2,1,1,2,2],
+            [1,2,1,2,1,2,2,1],
+            [1,2,1,2,2,1,1,2],
+            [1,2,1,2,2,2,1,1],
+            [1,2,2,1,1,1,2,2],
+            [1,2,2,1,2,1,1,2],
+            [1,2,2,1,2,2,1,1],
+            [1,2,2,2,1,1,1,2],
+            [1,2,2,2,1,1,2,1],
+            [1,2,2,2,1,2,1,1],
+            [1,2,2,2,2,1,1,1],
+        ];
+        $diff_min = 99;
+        $order_min = 0;
+        foreach($patterns as $order => $pattern) {
+            $sum1 = $sum2 = 0;
+            foreach($pattern as $index => $team) {
+                if ($team === 1) {
+                    $sum1 += $ranks[$index];
+                } else {
+                    $sum2 += $ranks[$index];
+                }
+            }
+            if ($diff_min > abs($sum1 - $sum2)) {
+                $diff_min = abs($sum1 - $sum2);
+                $order_min = $order;
+            }
+        }
+        return $patterns[$order_min];
     }
 }

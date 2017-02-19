@@ -4,7 +4,7 @@ namespace App\BotCommands;
 
 class MessageLottery
 {
-    public function handle()
+    public function handle($message, $from)
     {
         $entries = [
             "大吉" => 1,

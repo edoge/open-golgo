@@ -55,7 +55,7 @@ class IrcClient extends Command
                     } else {
                         $class_name = 'App\BotCommands\Message' . $mapping[$converted];
                         $executor = new $class_name();
-                        $bucket->getSource()->say($executor->handle());
+                        $bucket->getSource()->say($executor->handle($converted, $data['from']));
                     }
                 }
             }
