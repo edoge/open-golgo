@@ -3,4 +3,4 @@
 Homestead.json
 Homestead.yaml
 /database/database.sqlite
-.env
+/.env

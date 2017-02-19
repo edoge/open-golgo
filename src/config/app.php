@@ -15,4 +15,9 @@ return [
         '新規干す7' => 'Newhost',
     ],
     'irc_encoding' => 'ISO-2022-JP',
+    'blob' => [
+        'account' => env('BLOB_ACCOUNT'),
+        'key' => env('BLOB_KEY'),
+        'container' => env('BLOB_CONTAINER'),
+    ],
 ];

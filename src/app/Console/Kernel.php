@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\IrcClient::class,
         Commands\RankCrawler::class,
+        Commands\BackupDatabase::class,
+        Commands\RepairDatabase::class,
     ];
 
     /**
