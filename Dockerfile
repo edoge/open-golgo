@@ -154,7 +154,7 @@ RUN set -ex \
   && php artisan migrate
 
 ADD supervisor.conf /etc/supervisor.conf
-ADD backup_database.sh /etc/periodic/hourly/
+ADD backup_database /etc/periodic/hourly/
 ADD entrypoint.sh /root/
 RUN rm /etc/periodic/monthly/geoip
 
