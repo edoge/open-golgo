@@ -68,7 +68,7 @@ class IrcClient extends Command
             $class_name = 'App\BotCommands\Mention' . ucfirst(camel_case(trim($words[1])));
             if (class_exists($class_name)) {
                 $executor = new $class_name();
-                $bucket->getSource()->say($executor->handle());
+                $bucket->getSource()->say($executor->handle($bucket));
             }
         });
         $client->run();
